@@ -1,0 +1,4 @@
+SELECT [Fields]
+FROM WorkItems
+WHERE [Conditions]
+ORDER BY [Fields] [ASC/DESC]
