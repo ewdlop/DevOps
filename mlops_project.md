@@ -1,38 +1,39 @@
 # Project Structure
-mlops_project/
-├── .github/
-│   └── workflows/
-│       ├── ci_pipeline.yml
-│       └── cd_pipeline.yml
-├── src/
-│   ├── data/
-│   │   ├── __init__.py
-│   │   ├── data_ingestion.py
-│   │   └── data_validation.py
-│   ├── features/
-│   │   ├── __init__.py
-│   │   └── feature_engineering.py
-│   ├── models/
-│   │   ├── __init__.py
-│   │   ├── model.py
-│   │   └── hyperparameter_tuning.py
-│   └── monitoring/
-│       ├── __init__.py
-│       ├── model_monitoring.py
-│       └── drift_detection.py
-├── tests/
-│   ├── test_data_ingestion.py
-│   ├── test_feature_engineering.py
-│   └── test_model.py
-├── configs/
-│   ├── config.yaml
-│   └── model_params.json
-├── notebooks/
-│   └── experiment_tracking.ipynb
-├── requirements.txt
-└── Dockerfile
+> mlops_project/
+    ├── .github/
+    │   └── workflows/
+    │       ├── ci_pipeline.yml
+    │       └── cd_pipeline.yml
+    ├── src/
+    │   ├── data/
+    │   │   ├── __init__.py
+    │   │   ├── data_ingestion.py
+    │   │   └── data_validation.py
+    │   ├── features/
+    │   │   ├── __init__.py
+    │   │   └── feature_engineering.py
+    │   ├── models/
+    │   │   ├── __init__.py
+    │   │   ├── model.py
+    │   │   └── hyperparameter_tuning.py
+    │   └── monitoring/
+    │       ├── __init__.py
+    │       ├── model_monitoring.py
+    │       └── drift_detection.py
+    ├── tests/
+    │   ├── test_data_ingestion.py
+    │   ├── test_feature_engineering.py
+    │   └── test_model.py
+    ├── configs/
+    │   ├── config.yaml
+    │   └── model_params.json
+    ├── notebooks/
+    │   └── experiment_tracking.ipynb
+    ├── requirements.txt
+    └── Dockerfile
 
 # Data Ingestion Component
+```python
 from typing import Dict, Any
 import pandas as pd
 from great_expectations.dataset import PandasDataset
@@ -231,8 +232,11 @@ class ModelMonitoring:
                     break
         
         return degradation_detected
+```
+
 
 # CI/CD Pipeline Configuration (GitHub Actions)
+```yaml
 name: MLOps Pipeline
 
 on:
@@ -267,8 +271,10 @@ jobs:
       run: |
         echo "Deploying to production"
         # Add deployment steps here
-
+```
 # Docker Configuration
+
+```dockerfile
 FROM python:3.8-slim
 
 WORKDIR /app
@@ -279,3 +285,4 @@ RUN pip install -r requirements.txt
 COPY . .
 
 CMD ["python", "src/main.py"]
+```
