@@ -98,4 +98,206 @@
 - [Azure DevOps Pricing](https://azure.microsoft.com/en-us/pricing/details/devops/)
 - [Best Practices for Git in Azure Repos](https://learn.microsoft.com/en-us/azure/devops/repos/git/git-best-practices)
 
+
+### Work Item Query Language
+
+**WIQL (Work Item Query Language)** is a query language specific to Azure DevOps for filtering and retrieving work items. It is SQL-like and allows advanced querying of work items using the Azure DevOps API or query editor.
+
+Here’s a comprehensive guide with **examples** to help you write WIQL queries.
+
+---
+
+### **1. Basic WIQL Syntax**
+```wiql
+SELECT [Fields]
+FROM WorkItems
+WHERE [Conditions]
+ORDER BY [Fields] [ASC/DESC]
+```
+
+---
+
+### **2. Examples of WIQL Queries**
+#### **2.1. Retrieve All Active Work Items**
+```wiql
+SELECT [System.Id], [System.Title], [System.State]
+FROM WorkItems
+WHERE [System.State] = 'Active'
+```
+
+#### **2.2. User Stories Assigned to Me**
+```wiql
+SELECT [System.Id], [System.Title], [System.AssignedTo]
+FROM WorkItems
+WHERE [System.WorkItemType] = 'User Story'
+  AND [System.AssignedTo] = @Me
+```
+
+#### **2.3. Bugs Created in the Last 7 Days**
+```wiql
+SELECT [System.Id], [System.Title], [System.CreatedDate]
+FROM WorkItems
+WHERE [System.WorkItemType] = 'Bug'
+  AND [System.CreatedDate] >= @Today - 7
+```
+
+---
+
+### **3. Advanced WIQL Queries**
+#### **3.1. High-Priority Work Items**
+```wiql
+SELECT [System.Id], [System.Title], [Microsoft.VSTS.Common.Priority]
+FROM WorkItems
+WHERE [Microsoft.VSTS.Common.Priority] <= 2
+```
+
+#### **3.2. Work Items in a Specific Iteration**
+```wiql
+SELECT [System.Id], [System.Title], [System.IterationPath]
+FROM WorkItems
+WHERE [System.IterationPath] = 'ProjectName\Iteration1'
+```
+
+#### **3.3. Work Items Without Assigned Users**
+```wiql
+SELECT [System.Id], [System.Title], [System.AssignedTo]
+FROM WorkItems
+WHERE [System.AssignedTo] = ''
+```
+
+---
+
+### **4. Linked Work Items**
+#### **4.1. Find Child Work Items of a Specific Parent**
+```wiql
+SELECT [System.Id], [System.Title]
+FROM WorkItemLinks
+WHERE [Source].[System.Id] = 12345
+  AND [System.Links.LinkType] = 'System.LinkTypes.Hierarchy-Forward'
+MODE (Recursive)
+```
+
+#### **4.2. Work Items Blocking Others**
+```wiql
+SELECT [System.Id], [System.Title]
+FROM WorkItemLinks
+WHERE [Source].[System.State] = 'Active'
+  AND [System.Links.LinkType] = 'System.LinkTypes.Dependency-Forward'
+MODE (Recursive)
+```
+
+---
+
+### **5. Queries with Tags**
+#### **5.1. Work Items Containing a Specific Tag**
+```wiql
+SELECT [System.Id], [System.Title], [System.Tags]
+FROM WorkItems
+WHERE [System.Tags] CONTAINS 'Urgent'
+```
+
+#### **5.2. Work Items with Multiple Tags**
+```wiql
+SELECT [System.Id], [System.Title], [System.Tags]
+FROM WorkItems
+WHERE [System.Tags] CONTAINS 'Backend'
+  AND [System.Tags] CONTAINS 'API'
+```
+
+---
+
+### **6. Queries Using Date Ranges**
+#### **6.1. Recently Updated Work Items**
+```wiql
+SELECT [System.Id], [System.Title], [System.ChangedDate]
+FROM WorkItems
+WHERE [System.ChangedDate] >= @Today - 7
+```
+
+#### **6.2. Work Items with a Target Date**
+```wiql
+SELECT [System.Id], [System.Title], [Microsoft.VSTS.Scheduling.TargetDate]
+FROM WorkItems
+WHERE [Microsoft.VSTS.Scheduling.TargetDate] <= @Today + 14
+```
+
+---
+
+### **7. Sorting Queries**
+#### **7.1. Sort by Priority**
+```wiql
+SELECT [System.Id], [System.Title], [Microsoft.VSTS.Common.Priority]
+FROM WorkItems
+WHERE [System.State] = 'Active'
+ORDER BY [Microsoft.VSTS.Common.Priority] ASC
+```
+
+#### **7.2. Sort by Creation Date**
+```wiql
+SELECT [System.Id], [System.Title], [System.CreatedDate]
+FROM WorkItems
+ORDER BY [System.CreatedDate] DESC
+```
+
+---
+
+### **8. Combining Multiple Conditions**
+#### **8.1. Active User Stories Assigned to Me**
+```wiql
+SELECT [System.Id], [System.Title]
+FROM WorkItems
+WHERE [System.WorkItemType] = 'User Story'
+  AND [System.State] = 'Active'
+  AND [System.AssignedTo] = @Me
+```
+
+#### **8.2. Bugs in a Specific Area Path**
+```wiql
+SELECT [System.Id], [System.Title], [System.AreaPath]
+FROM WorkItems
+WHERE [System.WorkItemType] = 'Bug'
+  AND [System.AreaPath] UNDER 'ProjectName\Area1'
+```
+
+---
+
+### **9. Recursive Queries**
+#### **9.1. Retrieve Hierarchical Work Items**
+```wiql
+SELECT [System.Id], [System.Title]
+FROM WorkItemLinks
+WHERE [Source].[System.TeamProject] = 'ProjectName'
+  AND [System.Links.LinkType] = 'System.LinkTypes.Hierarchy-Forward'
+MODE (Recursive)
+```
+
+---
+
+### **10. Special WIQL Features**
+#### **10.1. Use Macros**
+- `@Me`: Logged-in user.
+- `@Today`: Current date.
+- `@CurrentIteration`: Current sprint.
+- `@StartOfWeek`: Start of the current week.
+- `@EndOfWeek`: End of the current week.
+
+#### **10.2. Query Fields**
+- `System.Id`
+- `System.Title`
+- `System.State`
+- `System.CreatedDate`
+- `System.AssignedTo`
+- `Microsoft.VSTS.Common.Priority`
+- `System.Tags`
+
+---
+
+### **Tips for Using WIQL**
+1. **Write and Test in Azure DevOps**: Use the **Query Editor** in Azure DevOps to build and validate your WIQL queries.
+2. **Combine WorkItemLinks and WorkItems**: For hierarchical data, use `WorkItemLinks` combined with `MODE (Recursive)`.
+3. **Use Dynamic Macros**: Use macros like `@CurrentIteration` for queries that adjust dynamically.
+4. **API Integration**: WIQL queries can be executed programmatically through the Azure DevOps REST API.
+
+WIQL is extremely versatile for managing and querying Azure DevOps work items. Let me know if you'd like to dive deeper into any specific aspect!
+
 Would you like assistance setting up a repository or integrating it with other tools?
